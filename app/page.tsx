@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import "./morat.css";
 
+import { europa } from "./fonts";
 import { readJson, configKey } from "@/lib/s3-client";
 import { moratConfigSchema } from "@/lib/schemas";
 import { DEFAULT_MORAT_CONFIG, type MoratConfig } from "@/lib/types";
@@ -129,7 +130,8 @@ export default async function HomePage() {
         />
       )}
 
-      <div className="mt-page">
+      {/* europa.variable exposes --font-europa to the stylesheet below this node */}
+      <div className={`mt-page ${europa.variable}`}>
         {!revealed ? (
           <AnuncioCountdown
             presenta={config.anuncioPresenta}
@@ -156,7 +158,8 @@ export default async function HomePage() {
             <VideosSection
               arte={config.arteTituloVideos}
               subtitulo={config.videosSubtitulo}
-              videos={config.videos}
+              video={config.video}
+              poster={config.artePosterVideo}
               arteIzq={config.arteLateralIzq}
               arteDer={config.arteLateralDer}
             />

@@ -42,11 +42,18 @@ export interface Integrante {
   spotify: string;
 }
 
-export interface VideoItem {
+/**
+ * The one featured video. Each URL is either a YouTube link (rendered in an
+ * iframe) or a direct file URL such as an MP4 on DO Spaces (rendered in a
+ * <video>). The type is detected from the URL, not configured.
+ */
+export interface VideoDestacado {
   titulo: string;
   descripcion: string;
-  /** YouTube watch, shorts, youtu.be or embed URL — normalized at render time. */
-  url: string;
+  /** Horizontal 16:9 cut, shown from 750px up. */
+  urlDesktop: string;
+  /** Vertical 9:16 cut, shown below 750px. Falls back to urlDesktop. */
+  urlMovil: string;
 }
 
 export interface FotoItem {
@@ -133,7 +140,9 @@ export interface MoratConfig {
   /* ── 8 · Videos ────────────────────────────────────────────────── */
   arteTituloVideos: ArtSlot;
   videosSubtitulo: string;
-  videos: VideoItem[];
+  video: VideoDestacado;
+  /** Cover frame. Matters for self-hosted files, which otherwise show black. */
+  artePosterVideo: ArtSlot;
   /** Side ornaments. Empty falls back to the drawn prism. */
   arteLateralIzq: ArtSlot;
   arteLateralDer: ArtSlot;
@@ -255,7 +264,8 @@ export const DEFAULT_MORAT_CONFIG: MoratConfig = {
 
   arteTituloVideos: { ...EMPTY_ART },
   videosSubtitulo: "El regreso a Venezuela, capítulo a capítulo",
-  videos: [],
+  video: { titulo: "", descripcion: "", urlDesktop: "", urlMovil: "" },
+  artePosterVideo: { ...EMPTY_ART },
   arteLateralIzq: { ...EMPTY_ART },
   arteLateralDer: { ...EMPTY_ART },
 

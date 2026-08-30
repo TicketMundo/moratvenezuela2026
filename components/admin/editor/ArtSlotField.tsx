@@ -13,6 +13,7 @@ export type ArtSlotName =
   | "arteTituloBanda"
   | "arteClaim"
   | "arteTituloVideos"
+  | "artePosterVideo"
   | "arteLateralIzq"
   | "arteLateralDer"
   | "artePatrocinadores"

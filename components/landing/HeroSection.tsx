@@ -1,7 +1,6 @@
 import type { MoratConfig } from "@/lib/types";
 import { isUrl, renderPipes, joinMeta } from "@/lib/morat-render";
 import { ArtImage } from "./ArtSlot";
-import { LightField } from "./LightField";
 import { ShowCountdown } from "./ShowCountdown";
 import { CtaButton } from "./CtaButton";
 
@@ -29,9 +28,9 @@ export function HeroSection({ config }: Props) {
 
   return (
     <section className="mt-sec mt-bleed">
+      {/* The backdrop is a single soft gradient on .mt-hero::after — the old
+          ray fan and SVG light field were removed, see app/morat.css. */}
       <div className="mt-hero">
-        <LightField />
-        <div className="mt-rays" aria-hidden="true" />
         <div className="mt-hero-inner">
           {config.presenta && (
             <p className="mt-eyebrow">

@@ -37,10 +37,11 @@ export const integranteSchema = z.object({
   spotify: z.string().default(""),
 });
 
-export const videoItemSchema = z.object({
+export const videoDestacadoSchema = z.object({
   titulo: z.string().default(""),
   descripcion: z.string().default(""),
-  url: z.string().default(""),
+  urlDesktop: z.string().default(""),
+  urlMovil: z.string().default(""),
 });
 
 export const fotoItemSchema = z.object({
@@ -129,7 +130,13 @@ export const moratConfigSchema = z.object({
   /* 8 · Videos */
   arteTituloVideos: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
   videosSubtitulo: z.string().default(""),
-  videos: z.array(videoItemSchema).default([]),
+  video: videoDestacadoSchema.default({
+    titulo: "",
+    descripcion: "",
+    urlDesktop: "",
+    urlMovil: "",
+  }),
+  artePosterVideo: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
   arteLateralIzq: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
   arteLateralDer: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
 

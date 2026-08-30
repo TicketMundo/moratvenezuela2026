@@ -36,15 +36,19 @@ html.mt-dark body {
 }
 
 .mt-page {
-  /* Display type is Archivo, loaded above with its variable width axis
-     (wdth 62..125). The headings below stretch it to 112–125%, and that
-     extended width IS the tour's look — see `font-stretch` on .mt-hero-title,
-     .mt-title-text, .mt-claim-big and friends.
+  /* Sans layer is Europa Grotesk, the brand face, injected as --font-europa
+     by next/font (see app/fonts.ts). Archivo stays behind it as the fallback,
+     which is also what makes reverting a one-line change.
 
-     To swap in a brand face later it must carry a width axis, or be an
-     Extended/Expanded cut. A normal-width font dropped in here renders every
-     heading ~25% narrower than the approved design. */
-  --mt-body: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+     Known tradeoff, accepted: Europa has no width axis, so the `font-stretch:
+     112%–125%` on .mt-hero-title, .mt-title-text, .mt-claim-big and friends is
+     inert. Headings render at its natural width — narrower than the original
+     Archivo comp, where that stretch was the look.
+
+     --mt-mono deliberately stays on IBM Plex Mono: Europa has no U+00B7 (·),
+     U+00A9 (©) or U+00BA (º), and every use of those in the copy lives in a
+     mono element. Pointing mono at Europa would break the middot mid-line. */
+  --mt-body: var(--font-europa, "Archivo"), "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --mt-display: var(--mt-body);
   --mt-mono: "IBM Plex Mono", monospace;
 
@@ -277,56 +281,28 @@ a[data-slot]:hover img {
   padding: 96px 18px 70px;
   overflow: hidden;
 }
-.mt-lightfield {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0.5;
-}
+/* The hero used to carry two hard light effects: a repeating-conic-gradient
+   ray fan (.mt-rays, animated) and an SVG field of specks and tunnel beams
+   (.mt-lightfield). Both raked across the title and read as glare, so they
+   were dropped in favour of the same soft glow the footer uses — colour
+   rising off the floor instead of beams cutting across the art.
+
+   Three layers: a key light from above, then the footer's violet and red
+   lifting from the bottom edge. All of it in one pseudo-element, so there is
+   no extra markup and nothing to animate. */
 .mt-hero::after {
-  /* túnel de luz que baja al escenario */
   content: "";
   position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-  width: min(780px, 92%);
-  height: 70%;
+  inset: 0;
   pointer-events: none;
-  background: radial-gradient(60% 100% at 50% 0%, rgba(244, 242, 236, 0.12), rgba(244, 242, 236, 0) 70%);
+  background:
+    radial-gradient(72% 58% at 50% 0%, rgba(244, 242, 236, 0.12), transparent 72%),
+    radial-gradient(60% 70% at 50% 100%, rgba(111, 91, 255, 0.2), transparent 70%),
+    radial-gradient(40% 55% at 50% 100%, rgba(255, 77, 109, 0.12), transparent 72%);
 }
 .mt-hero-inner {
   position: relative;
   z-index: 1;
-}
-
-/* Rayos solares que bajan sobre el titulo */
-.mt-rays {
-  position: absolute;
-  left: 50%;
-  top: -25%;
-  width: min(1500px, 170%);
-  height: 150%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.7;
-  mix-blend-mode: screen;
-  background: repeating-conic-gradient(
-    from 192deg at 50% 0%,
-    rgba(244, 242, 236, 0) 0deg 2.2deg,
-    rgba(244, 242, 236, 0.16) 2.2deg 3.4deg,
-    rgba(244, 242, 236, 0) 3.4deg 7deg
-  );
-  -webkit-mask-image: radial-gradient(78% 105% at 50% 0%, #000 35%, transparent 88%);
-  mask-image: radial-gradient(78% 105% at 50% 0%, #000 35%, transparent 88%);
-  animation: mtRays 16s ease-in-out infinite alternate;
-}
-@keyframes mtRays {
-  from { transform: translateX(-50%) rotate(-1.6deg); opacity: 0.5; }
-  to { transform: translateX(-50%) rotate(1.6deg); opacity: 0.85; }
 }
 .mt-hero-title {
   position: relative;
@@ -998,7 +974,11 @@ a[data-slot]:hover img {
   margin: 0 auto;
   max-width: 860px;
   font-family: var(--mt-display);
-  font-size: clamp(34px, 7vw, 74px);
+  /* The floor used to be 34px, which stopped scaling below a 486px viewport
+     while the screen kept shrinking — long single words like RECORDAREMOS
+     then ran off the right edge on every phone. Lowering it lets 7vw govern
+     all the way down, so the headline stays proportional to the screen. */
+  font-size: clamp(22px, 7vw, 74px);
   font-weight: 900;
   font-stretch: 120%;
   line-height: 1.02;
@@ -1068,11 +1048,14 @@ a[data-slot]:hover img {
   height: auto;
   display: block;
 }
+/* Offsets clear the featured video's half-width (820/2 = 410) plus a gap.
+   They were tuned for the old 330px vertical carousel; a horizontal cut is
+   much wider, so the prisms had to move out or they would sit on top of it. */
 .mt-side-left {
-  right: calc(50% + 178px);
+  right: calc(50% + 430px);
 }
 .mt-side-right {
-  left: calc(50% + 178px);
+  left: calc(50% + 430px);
 }
 .mt-side.mt-clickable {
   pointer-events: auto;
@@ -1247,6 +1230,52 @@ a[data-slot]:hover img {
   padding: 20px;
   background: rgba(244, 242, 236, 0.02);
 }
+/* ===== Video destacado =====
+   One video with two cuts: horizontal on desktop, vertical on phones. Both
+   land in the DOM and CSS picks one, so there is no matchMedia, no hydration
+   mismatch and no flash. The hidden variant costs nothing: <video> carries
+   preload="none", and browsers skip lazy iframes inside display:none. */
+.mt-feature {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.mt-feature-desktop {
+  max-width: min(820px, 92vw);
+}
+.mt-feature-movil {
+  display: none;
+}
+@media (max-width: 749px) {
+  .mt-feature-desktop { display: none; }
+  .mt-feature-movil { display: flex; width: min(330px, 80vw); }
+  /* No vertical cut uploaded: the horizontal one plays here instead, so the
+     frame widens and stays 16:9 rather than cropping it to a tall slot. */
+  .mt-feature-movil.mt-feature-16x9 { width: min(560px, 92vw); }
+}
+.mt-feature-movil.mt-feature-16x9 .mt-feature-frame { aspect-ratio: 16 / 9; }
+
+.mt-feature-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(244, 242, 236, 0.04);
+  box-shadow: 0 14px 50px rgba(0, 0, 0, 0.5);
+}
+.mt-feature-desktop .mt-feature-frame { aspect-ratio: 16 / 9; }
+.mt-feature-movil .mt-feature-frame { aspect-ratio: 9 / 16; }
+.mt-feature-frame > iframe,
+.mt-feature-frame > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  object-fit: cover;
+}
+
 @media (max-width: 749px) {
   .mt-car-stage { gap: 16px; }
   .mt-car-info { max-width: none; width: 100%; }
@@ -1557,7 +1586,6 @@ a.mt-sponsor:hover {
   .mt-hero-title { animation: none; }
   .mt-car-track, .mt-ph-track { transition: none; }
   .mt-marquee-track { animation: none; }
-  .mt-rays { animation: none; }
   .mt-hero-title::after { animation: none; opacity: 0; }
   .mt-side svg, .mt-side .mt-ray { animation: none; }
   /* Sponsors settle into a centred static row; the duplicate copies that
@@ -1585,10 +1613,12 @@ a.mt-sponsor:hover {
 }
 
 /* Los prismas acompañan tambien en tablet, algo mas pequeños */
+/* The video is capped at 92vw here, so the prisms follow it inward and the
+   section's overflow:hidden trims whatever still sticks out. */
 @media (max-width: 1080px) {
   .mt-side { width: clamp(120px, 17vw, 200px); }
-  .mt-side-left { right: calc(50% + 172px); }
-  .mt-side-right { left: calc(50% + 172px); }
+  .mt-side-left { right: calc(50% + 47vw); }
+  .mt-side-right { left: calc(50% + 47vw); }
 }
 @media (max-width: 680px) {
   .mt-side, .mt-side-chev { display: none; }
@@ -1621,8 +1651,6 @@ a.mt-sponsor:hover {
   .mt-tgroup { padding: 22px 18px; }
   .mt-car-arrow { width: 46px; height: 46px; font-size: 22px; }
   .mt-hero { padding: 58px 14px 46px; }
-  /* el abanico de rayos es costoso en moviles: se aligera */
-  .mt-rays { width: 200%; opacity: 0.55; }
   .mt-hero-title { filter: drop-shadow(0 0 22px rgba(244, 242, 236, 0.18)); }
   .mt-showcount { gap: 8px; }
   .mt-sc-cell { padding: 12px 6px 10px; border-radius: 3px; }
@@ -1633,10 +1661,21 @@ a.mt-sponsor:hover {
 }
 
 /* ===== Telefono pequeño ===== */
+/* The tour name has to read as one line. Its 0.44em tracking is ~37% of the
+   line's width, so tightening the tracking buys far more room than shrinking
+   the type. The old rule that did this was scoped to max-width 380px, which
+   no iPhone since the 12 matches (390, 393, 402, 430) — hence the wrap.
+   Capped at 17px so it meets the base rule's value at this breakpoint. */
+@media (max-width: 600px) {
+  .mt-hero-tour {
+    font-size: clamp(11px, 3.2vw, 17px);
+    letter-spacing: 0.26em;
+  }
+}
+
 @media (max-width: 380px) {
   .mt-sec { padding: 28px 13px; }
   .mt-tgroup { padding: 18px 15px; }
   .mt-showcount { gap: 6px; }
   .mt-sc-cell { min-width: 0; flex: 1; padding: 11px 4px 9px; }
-  .mt-hero-tour { letter-spacing: 0.3em; }
 }

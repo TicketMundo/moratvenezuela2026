@@ -10,6 +10,15 @@ export function isUrl(value: string | undefined | null): value is string {
   return value.startsWith("http") || value.startsWith("data:");
 }
 
+/**
+ * Whether a URL should be played through YouTube's iframe player rather than
+ * a native <video>. Anything else — an MP4 on DO Spaces, for instance — is
+ * treated as a direct file, so no manual "source type" field is needed.
+ */
+export function isYoutube(url: string): boolean {
+  return /(?:^|\.)youtube\.com\/|(?:^|\.)youtu\.be\//.test(url);
+}
+
 /** Normalizes any YouTube URL flavour (watch, youtu.be, shorts) to /embed/. */
 export function toEmbed(url: string): string {
   if (!url) return "";

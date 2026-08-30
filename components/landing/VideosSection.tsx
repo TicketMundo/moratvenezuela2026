@@ -1,168 +1,126 @@
-"use client";
-import { useState } from "react";
-import type { ArtSlot, VideoItem } from "@/lib/types";
-import { isUrl, toEmbed } from "@/lib/morat-render";
+import type { ArtSlot, VideoDestacado } from "@/lib/types";
+import { isUrl, isYoutube, toEmbed } from "@/lib/morat-render";
 import { SectionTitle } from "./ArtSlot";
 import { PrismOrnament } from "./PrismOrnament";
 
 interface Props {
   arte: ArtSlot;
   subtitulo: string;
-  videos: VideoItem[];
+  video: VideoDestacado;
+  poster: ArtSlot;
   arteIzq: ArtSlot;
   arteDer: ArtSlot;
 }
 
 /** Left/right decoration: uploaded art if present, the drawn prism otherwise. */
-function Side({
-  art,
-  dir,
-  onClick,
-  title,
-}: {
-  art: ArtSlot;
-  dir: 1 | -1;
-  onClick?: () => void;
-  title?: string;
-}) {
-  const position = dir > 0 ? "mt-side-left" : "mt-side-right";
-  const className = `mt-side ${position}${onClick ? " mt-clickable" : ""}`;
-  const content = isUrl(art.image) ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={art.image} alt="" />
-  ) : (
-    <PrismOrnament dir={dir} />
+function Side({ art, dir }: { art: ArtSlot; dir: 1 | -1 }) {
+  return (
+    <div className={`mt-side ${dir > 0 ? "mt-side-left" : "mt-side-right"}`} aria-hidden="true">
+      {isUrl(art.image) ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={art.image} alt="" />
+      ) : (
+        <PrismOrnament dir={dir} />
+      )}
+    </div>
   );
+}
 
-  if (!onClick) {
+/**
+ * YouTube links play through the iframe player; anything else — an MP4 on DO
+ * Spaces, say — plays natively. The source type comes from the URL, so the
+ * admin never has to declare it.
+ *
+ * `preload="none"` and `loading="lazy"` are what let both the desktop and the
+ * mobile cut sit in the DOM at once without either costing bandwidth.
+ */
+function Player({
+  url,
+  poster,
+  titulo,
+}: {
+  url: string;
+  poster: string;
+  titulo: string;
+}) {
+  if (isYoutube(url)) {
     return (
-      <div className={className} aria-hidden="true">
-        {content}
+      <div className="mt-feature-frame">
+        <iframe
+          src={toEmbed(url)}
+          title={titulo || "Video"}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+        />
       </div>
     );
   }
 
   return (
-    <div className={className} title={title} role="button" tabIndex={-1} onClick={onClick}>
-      {content}
+    <div className="mt-feature-frame">
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        src={url}
+        poster={isUrl(poster) ? poster : undefined}
+        controls
+        playsInline
+        preload="none"
+      />
     </div>
   );
 }
 
-export function VideosSection({ arte, subtitulo, videos, arteIzq, arteDer }: Props) {
-  const items = videos.filter((v) => !!v.url);
-  const total = items.length;
-  const [idx, setIdx] = useState(0);
+export function VideosSection({ arte, subtitulo, video, poster, arteIzq, arteDer }: Props) {
+  const tieneDesktop = isUrl(video.urlDesktop);
+  const tieneVertical = isUrl(video.urlMovil);
+  const hayVideo = tieneDesktop || tieneVertical;
 
-  const go = (i: number) => setIdx(((i % total) + total) % total);
-  const hasNav = total > 1;
+  // Without a vertical cut the horizontal one plays on phones too, and the
+  // frame switches to 16:9 so it is letterboxed rather than cropped.
+  const urlMovil = tieneVertical ? video.urlMovil : video.urlDesktop;
+  const urlDesktop = tieneDesktop ? video.urlDesktop : video.urlMovil;
 
   return (
     <section className="mt-sec mt-video-sec">
       <SectionTitle slot="videosTitle" art={arte} text="Morat en vivo" />
       {subtitulo && <p className="mt-videos-sub">{subtitulo}</p>}
 
-      <div className={`mt-video-stage${hasNav ? " mt-has-nav" : ""}`}>
-        <Side
-          art={arteIzq}
-          dir={1}
-          onClick={hasNav ? () => go(idx - 1) : undefined}
-          title="Video anterior"
-        />
-        <Side
-          art={arteDer}
-          dir={-1}
-          onClick={hasNav ? () => go(idx + 1) : undefined}
-          title="Video siguiente"
-        />
-        {hasNav && (
-          <>
-            <span className="mt-side-chev mt-side-chev-left" aria-hidden="true">
-              ‹
-            </span>
-            <span className="mt-side-chev mt-side-chev-right" aria-hidden="true">
-              ›
-            </span>
-          </>
-        )}
+      <div className="mt-video-stage">
+        <Side art={arteIzq} dir={1} />
+        <Side art={arteDer} dir={-1} />
 
-        {total === 0 ? (
-          <div className="mt-carousel">
+        <div className="mt-carousel">
+          {!hayVideo ? (
             <div className="mt-car-empty">
               VIDEOS
               <br />
               PRÓXIMAMENTE
             </div>
-          </div>
-        ) : (
-          <div className="mt-carousel">
-            {/* column-reverse in CSS: the viewport paints above the info block */}
+          ) : (
+            // column-reverse in CSS: the player paints above the text block
             <div className="mt-car-stage">
               <div className="mt-car-info">
-                <p className="mt-car-counter">
-                  Video {idx + 1} de {total}
-                </p>
-                <h4 className="mt-car-eptitle">{items[idx].titulo}</h4>
-                <p className="mt-car-epdesc">{items[idx].descripcion}</p>
-
-                {hasNav && (
-                  <>
-                    <div className="mt-car-nav">
-                      <button
-                        type="button"
-                        className="mt-car-arrow mt-car-prev"
-                        aria-label="Anterior"
-                        onClick={() => go(idx - 1)}
-                      >
-                        ‹
-                      </button>
-                      <button
-                        type="button"
-                        className="mt-car-arrow mt-car-next"
-                        aria-label="Siguiente"
-                        onClick={() => go(idx + 1)}
-                      >
-                        ›
-                      </button>
-                    </div>
-                    <div className="mt-car-dots">
-                      {items.map((_, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          className={`mt-car-dot${i === idx ? " is-active" : ""}`}
-                          aria-label={`Ir al video ${i + 1}`}
-                          onClick={() => go(i)}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
+                {video.titulo && <h4 className="mt-car-eptitle">{video.titulo}</h4>}
+                {video.descripcion && <p className="mt-car-epdesc">{video.descripcion}</p>}
               </div>
 
-              <div className="mt-car-viewport">
-                <div
-                  className="mt-car-track"
-                  style={{ transform: `translateX(${-idx * 100}%)` }}
-                >
-                  {items.map((video, i) => (
-                    <div className="mt-car-slide" key={i}>
-                      <div className="mt-car-slide-inner">
-                        <iframe
-                          src={toEmbed(video.url)}
-                          title={video.titulo || `Video ${i + 1}`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          loading="lazy"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="mt-feature mt-feature-desktop">
+                <Player url={urlDesktop} poster={poster.image} titulo={video.titulo} />
+              </div>
+
+              <div
+                className={`mt-feature mt-feature-movil${tieneVertical ? "" : " mt-feature-16x9"}`}
+              >
+                <Player
+                  url={urlMovil}
+                  poster={poster.imageMobile || poster.image}
+                  titulo={video.titulo}
+                />
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

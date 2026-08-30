@@ -1,39 +1,42 @@
 "use client";
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { Plus, Trash2, ArrowUp, ArrowDown, Video } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Card } from "@/components/ui/Card";
 import { ArtSlotField } from "@/components/admin/editor/ArtSlotField";
+import { isUrl, isYoutube } from "@/lib/morat-render";
 import type { MoratConfigInput } from "@/lib/schemas";
 
 interface Props {
   eventoId: string;
 }
 
+/** Tells the editor which player their URL will land in, before they save. */
+function FuenteHint({ url }: { url: string }) {
+  if (!isUrl(url)) return null;
+  return (
+    <span className="text-xs opacity-60">
+      {isYoutube(url)
+        ? "Detectado: YouTube — se muestra con el reproductor de YouTube."
+        : "Detectado: archivo directo — se muestra con el reproductor del navegador."}
+    </span>
+  );
+}
+
 export function VideosSection({ eventoId }: Props) {
-  const { control, register } = useFormContext<MoratConfigInput>();
-  const { fields, append, remove, move } = useFieldArray({ control, name: "videos" });
+  const { register, watch } = useFormContext<MoratConfigInput>();
+
+  const urlDesktop = watch("video.urlDesktop") ?? "";
+  const urlMovil = watch("video.urlMovil") ?? "";
 
   return (
     <section id="videos" className="flex flex-col gap-4 scroll-mt-32">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-semibold">Videos</h2>
-          <p className="text-sm opacity-60 mt-0.5">
-            Carrusel vertical 9:16. Acepta links de YouTube normales, Shorts o youtu.be.
-          </p>
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => append({ titulo: "", descripcion: "", url: "" })}
-        >
-          <Plus className="h-4 w-4" />
-          Video
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold">Video</h2>
+        <p className="text-sm opacity-60 mt-0.5">
+          Un solo video, con una versión horizontal para escritorio y una vertical para móvil.
+          Acepta links de YouTube o la URL directa de un archivo subido a DigitalOcean Spaces.
+        </p>
       </div>
 
       <Card>
@@ -45,71 +48,69 @@ export function VideosSection({ eventoId }: Props) {
         />
       </Card>
 
-      {fields.length === 0 && (
-        <Card className="flex flex-col items-center gap-2 py-10 opacity-50">
-          <Video className="h-8 w-8" />
-          <p className="text-sm">Sin videos — la sección muestra “Próximamente”.</p>
-        </Card>
-      )}
+      <Card className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Video escritorio — horizontal 16:9"
+            id="video.urlDesktop"
+            placeholder="https://... .mp4  o  https://youtube.com/..."
+            {...register("video.urlDesktop")}
+          />
+          <FuenteHint url={urlDesktop} />
+        </div>
 
-      <div className="flex flex-col gap-4">
-        {fields.map((field, idx) => (
-          <Card key={field.id} className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col gap-0.5">
-                  <button
-                    type="button"
-                    aria-label="Mover arriba"
-                    disabled={idx === 0}
-                    onClick={() => move(idx, idx - 1)}
-                    className="h-5 w-5 inline-flex items-center justify-center rounded hover:bg-base-light dark:hover:bg-base-dark disabled:opacity-30 transition-colors"
-                  >
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Mover abajo"
-                    disabled={idx === fields.length - 1}
-                    onClick={() => move(idx, idx + 1)}
-                    className="h-5 w-5 inline-flex items-center justify-center rounded hover:bg-base-light dark:hover:bg-base-dark disabled:opacity-30 transition-colors"
-                  >
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <span className="text-sm font-medium opacity-60">Video {idx + 1}</span>
-              </div>
-              <button
-                type="button"
-                aria-label={`Eliminar video ${idx + 1}`}
-                onClick={() => remove(idx)}
-                className="h-7 w-7 inline-flex items-center justify-center rounded-input hover:bg-brand/10 text-brand transition-colors"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Video móvil — vertical 9:16"
+            id="video.urlMovil"
+            placeholder="https://... .mp4  o  https://youtube.com/..."
+            {...register("video.urlMovil")}
+          />
+          <FuenteHint url={urlMovil} />
+          {!isUrl(urlMovil) && isUrl(urlDesktop) && (
+            <span className="text-xs opacity-60">
+              Vacío: en móvil se usa el horizontal, en un marco 16:9 para no recortarlo.
+            </span>
+          )}
+        </div>
 
-            <Input
-              label="Título"
-              id={`videos.${idx}.titulo`}
-              placeholder="Ej: El anuncio"
-              {...register(`videos.${idx}.titulo`)}
-            />
-            <Textarea
-              label="Descripción"
-              id={`videos.${idx}.descripcion`}
-              rows={2}
-              {...register(`videos.${idx}.descripcion`)}
-            />
-            <Input
-              label="Link de YouTube"
-              id={`videos.${idx}.url`}
-              placeholder="https://www.youtube.com/shorts/..."
-              {...register(`videos.${idx}.url`)}
-            />
-          </Card>
-        ))}
-      </div>
+        <div className="flex flex-col gap-1 text-xs opacity-60">
+          <p>
+            Los archivos de video no se suben desde acá — pesan demasiado para este formulario.
+            Subilos al bucket de DigitalOcean Spaces y pegá la URL pública.
+          </p>
+          <p>
+            Exportá en <strong>MP4 con video H.264 y audio AAC</strong>, y activá{" "}
+            <em>faststart</em>. Los navegadores no reproducen audio PCM (el que traen los
+            .mov de edición): el video se ve pero el control de volumen aparece deshabilitado.
+            Sin faststart, el navegador tiene que bajar el archivo entero antes de arrancar.
+          </p>
+        </div>
+      </Card>
+
+      <Card className="flex flex-col gap-4">
+        <h3 className="text-sm font-semibold">Textos</h3>
+        <Input
+          label="Título"
+          id="video.titulo"
+          placeholder="Ej: El anuncio"
+          {...register("video.titulo")}
+        />
+        <Textarea
+          label="Descripción"
+          id="video.descripcion"
+          rows={3}
+          {...register("video.descripcion")}
+        />
+      </Card>
+
+      <ArtSlotField
+        name="artePosterVideo"
+        eventoId={eventoId}
+        title="Portada del video"
+        hint="Se ve antes de darle play. Importa si el video es un archivo propio: sin portada arranca en negro. La versión móvil se usa en el corte vertical. No aplica a YouTube, que trae su propia miniatura."
+        showLink={false}
+      />
 
       <ArtSlotField
         name="arteTituloVideos"
@@ -124,7 +125,7 @@ export function VideosSection({ eventoId }: Props) {
           name="arteLateralIzq"
           eventoId={eventoId}
           title="Adorno lateral izquierdo"
-          hint="Sin imagen se dibuja el prisma de la gira."
+          hint="Sin imagen se dibuja el prisma de la gira. Solo se ve en escritorio."
           showLink={false}
           aspect="aspect-[260/560]"
         />
@@ -132,7 +133,7 @@ export function VideosSection({ eventoId }: Props) {
           name="arteLateralDer"
           eventoId={eventoId}
           title="Adorno lateral derecho"
-          hint="Sin imagen se dibuja el prisma de la gira."
+          hint="Sin imagen se dibuja el prisma de la gira. Solo se ve en escritorio."
           showLink={false}
           aspect="aspect-[260/560]"
         />
