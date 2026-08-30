@@ -21,15 +21,8 @@ export function FotosSection({ fotos }: Props) {
     return () => clearInterval(id);
   }, [total, paused]);
 
-  if (total === 0) {
-    return (
-      <section className="mt-sec">
-        <div className="mt-photos">
-          <div className="mt-ph-empty">FOTOS · PRÓXIMAMENTE</div>
-        </div>
-      </section>
-    );
-  }
+  // Nothing uploaded yet — drop the section rather than show an empty frame.
+  if (total === 0) return null;
 
   const go = (i: number) => setIdx(((i % total) + total) % total);
   const hasNav = total > 1;

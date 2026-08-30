@@ -26,7 +26,7 @@ export function FotosSection({ eventoId }: Props) {
         <div>
           <h2 className="text-lg font-semibold">Fotos</h2>
           <p className="text-sm opacity-60 mt-0.5">
-            Carrusel con avance automático. Sin fotos muestra “Fotos · Próximamente”.
+            Carrusel con avance automático. Sin fotos cargadas, la sección no se muestra.
           </p>
         </div>
         <Button
