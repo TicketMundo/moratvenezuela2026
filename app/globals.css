@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f8f8f8;
+  color: #0f0f0f;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.dark body {
+  background-color: #0f0f0f;
+  color: #f8f8f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid #e63946;
+  outline-offset: 2px;
+}
