@@ -55,6 +55,13 @@ export interface FotoItem {
   link: string;
 }
 
+export interface Patrocinador {
+  /** Doubles as the image alt text, so it is required. */
+  nombre: string;
+  logo: string;
+  link: string;
+}
+
 export interface EnlaceLegal {
   label: string;
   link: string;
@@ -135,7 +142,10 @@ export interface MoratConfig {
   fotos: FotoItem[];
 
   /* ── 10 · Patrocinadores ───────────────────────────────────────── */
+  /** A composed banner. When set it replaces the logo strip entirely. */
   artePatrocinadores: ArtSlot;
+  /** Individual logos, shown on a light band because the artwork is black. */
+  patrocinadores: Patrocinador[];
 
   /* ── 11 · Pie ──────────────────────────────────────────────────── */
   arteFooter: ArtSlot;
@@ -252,6 +262,7 @@ export const DEFAULT_MORAT_CONFIG: MoratConfig = {
   fotos: [],
 
   artePatrocinadores: { ...EMPTY_ART },
+  patrocinadores: [],
 
   arteFooter: { ...EMPTY_ART },
   footerFecha: "12 y 13 de Diciembre 2026 · Universidad Simón Bolívar, Caracas",

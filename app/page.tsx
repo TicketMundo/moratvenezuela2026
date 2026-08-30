@@ -161,7 +161,10 @@ export default async function HomePage() {
               arteDer={config.arteLateralDer}
             />
             <FotosSection fotos={config.fotos} />
-            <PatrocinadoresSection arte={config.artePatrocinadores} />
+            <PatrocinadoresSection
+              arte={config.artePatrocinadores}
+              patrocinadores={config.patrocinadores}
+            />
             <PieSection config={config} />
           </div>
         )}

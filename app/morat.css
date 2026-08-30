@@ -1330,6 +1330,102 @@ a[data-slot]:hover img {
   background: rgba(244, 242, 236, 0.02);
 }
 
+/* ===== Patrocinadores — banner ===== */
+/* The banner is black artwork on transparency (measured: 89% of its pixels
+   sit at alpha 0, and the opaque ones average brightness 5/255), so on the
+   page's dark ground it reads as an empty strip. This gives it the same light
+   ground the buttons use.
+
+   Only applied when an image exists — the empty-state marker is a light
+   dashed border and has to stay on dark to be visible. */
+.mt-sponsors-banner {
+  background: var(--mt-hueso);
+  padding: clamp(14px, 2.4vw, 26px) clamp(12px, 3vw, 40px);
+}
+/* The source art is 2187px wide; capping keeps it from upscaling and going
+   soft on wide monitors. */
+.mt-sponsors-banner > * {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ===== Patrocinadores — franja de logos (DORMIDA) =====
+   Not dead code: this whole block only renders when
+   PATROCINADORES_LOGOS_INDIVIDUALES is on in lib/feature-flags.ts. Today the
+   section is a single full-width banner, so none of it is emitted. Keep it.
+
+   The sponsor artwork is black, so the strip needs a bright ground. Same
+   #f4f2ec the buttons use, spanning the full width. */
+.mt-sponsors {
+  position: relative;
+  background: var(--mt-hueso);
+  padding: clamp(22px, 3.4vw, 38px) 0;
+  overflow: hidden;
+}
+/* Fade the logos into the band edges instead of clipping them hard. */
+.mt-sponsors::before,
+.mt-sponsors::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(28px, 7vw, 90px);
+  z-index: 1;
+  pointer-events: none;
+}
+.mt-sponsors::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--mt-hueso), rgba(244, 242, 236, 0));
+}
+.mt-sponsors::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--mt-hueso), rgba(244, 242, 236, 0));
+}
+
+.mt-sponsors-track {
+  display: flex;
+  align-items: center;
+  gap: clamp(30px, 6vw, 72px);
+  width: max-content;
+  animation: mtSponsors 38s linear infinite;
+}
+/* The component renders the list an even number of times, so -50% always
+   lands on an identical frame — seamless at any logo count. */
+@keyframes mtSponsors {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.mt-sponsors:hover .mt-sponsors-track {
+  animation-play-state: paused;
+}
+
+/* display:contents keeps the flex gap uniform across copy boundaries. */
+.mt-sponsors-copy {
+  display: contents;
+}
+
+.mt-sponsor {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Overrides `.mt-page img { width:100% }`. Logos keep their aspect ratio and
+   are normalized by height so mixed artwork sits on one optical line. */
+.mt-sponsors img {
+  width: auto;
+  height: clamp(26px, 4.2vw, 50px);
+  max-width: none;
+  object-fit: contain;
+}
+a.mt-sponsor {
+  transition: opacity 0.15s, transform 0.15s;
+}
+a.mt-sponsor:hover {
+  opacity: 0.7;
+  transform: translateY(-2px);
+}
+
 /* ===== Pie ===== */
 .mt-footer {
   position: relative;
@@ -1464,6 +1560,15 @@ a[data-slot]:hover img {
   .mt-rays { animation: none; }
   .mt-hero-title::after { animation: none; opacity: 0; }
   .mt-side svg, .mt-side .mt-ray { animation: none; }
+  /* Sponsors settle into a centred static row; the duplicate copies that
+     exist only to feed the loop are dropped. */
+  .mt-sponsors-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+  .mt-sponsors-copy:not(:first-child) { display: none; }
 }
 
 /* ═══════════ MOVIL Y TABLET ═══════════ */

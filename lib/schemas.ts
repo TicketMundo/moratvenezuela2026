@@ -49,6 +49,12 @@ export const fotoItemSchema = z.object({
   link: z.string().default(""),
 });
 
+export const patrocinadorSchema = z.object({
+  nombre: z.string().min(1, "Requerido"),
+  logo: z.string().default(""),
+  link: z.string().default(""),
+});
+
 export const enlaceLegalSchema = z.object({
   label: z.string().min(1, "Requerido"),
   link: z.string().default(""),
@@ -132,6 +138,7 @@ export const moratConfigSchema = z.object({
 
   /* 10 · Patrocinadores */
   artePatrocinadores: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
+  patrocinadores: z.array(patrocinadorSchema).default([]),
 
   /* 11 · Pie */
   arteFooter: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
