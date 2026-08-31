@@ -1,3 +1,5 @@
+import cusicaLogo from "@/app/assets/images/logo-cusica.png";
+import moratLogo from "@/app/assets/images/morat.png";
 import type { MoratConfig } from "@/lib/types";
 import { isUrl, renderPipes, joinMeta } from "@/lib/morat-render";
 import { ArtImage } from "./ArtSlot";
@@ -32,16 +34,37 @@ export function HeroSection({ config }: Props) {
           ray fan and SVG light field were removed, see app/morat.css. */}
       <div className="mt-hero">
         <div className="mt-hero-inner">
-          {config.presenta && (
-            <p className="mt-eyebrow">
-              <span className="mt-dot" />
-              <span>{config.presenta}</span>
-            </p>
-          )}
+          {/* Cusica lockup: the mark, with the caption under it. Dimensions come
+              from the static import so the logo reserves its space before it
+              loads and the hero does not shift. */}
+          <div className="mt-presenta">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="mt-presenta-logo"
+              src={cusicaLogo.src}
+              width={cusicaLogo.width}
+              height={cusicaLogo.height}
+              alt="Cusica"
+            />
+            {config.presenta && (
+              <p className="mt-eyebrow">
+                <span className="mt-dot" />
+                <span>{config.presenta}</span>
+              </p>
+            )}
+          </div>
 
-          {/* data-text drives the overhead-light and light-sweep pseudo-elements */}
-          <h1 className="mt-hero-title" data-text={config.bandName}>
-            {config.bandName}
+          {/* The mark stands in for the wordmark. bandName still carries the
+              accessible name and the metadata title. */}
+          <h1 className="mt-hero-logo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={moratLogo.src}
+              width={moratLogo.width}
+              height={moratLogo.height}
+              alt={config.bandName || "Morat"}
+              fetchPriority="high"
+            />
           </h1>
 
           <div className="mt-prism-bar mt-prism-bar-wide" />

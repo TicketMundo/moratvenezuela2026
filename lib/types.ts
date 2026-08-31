@@ -195,7 +195,8 @@ export const DEFAULT_MORAT_CONFIG: MoratConfig = {
   anuncioTitulo: "Algo grande se acerca",
   anuncioSubtitulo: "Lunes 31 de agosto · 11:00 AM (Venezuela)",
 
-  presenta: "Cusica presenta",
+  // Caption under the Cusica mark, so it no longer repeats the brand name.
+  presenta: "presenta",
   bandName: "MORAT",
   tourName: "Ya Es Mañana |World Tour|",
   metaFecha: "Sábado 12 y Domingo 13 · Diciembre · 2026",

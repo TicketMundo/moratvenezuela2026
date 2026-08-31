@@ -26,12 +26,17 @@ export function IntroSection({ eventoId }: Props) {
       <Card className="flex flex-col gap-4">
         <h3 className="text-sm font-semibold">Textos</h3>
 
-        <Input
-          label="1 · Presenta"
-          id="presenta"
-          placeholder="Ej: Cusica presenta"
-          {...register("presenta")}
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            label="1 · Presenta"
+            id="presenta"
+            placeholder="Ej: presenta"
+            {...register("presenta")}
+          />
+          <span className="text-xs opacity-60">
+            Va debajo del logo de Cusica, así que no repitas la marca acá.
+          </span>
+        </div>
         <Input
           label="2 · Nombre del artista"
           id="bandName"
