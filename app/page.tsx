@@ -167,6 +167,7 @@ export default async function HomePage() {
             <PatrocinadoresSection
               arte={config.artePatrocinadores}
               patrocinadores={config.patrocinadores}
+              fondo={config.patrocinadoresFondo}
             />
             <PieSection config={config} />
           </div>

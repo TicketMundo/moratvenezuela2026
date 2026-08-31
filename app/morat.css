@@ -1407,8 +1407,19 @@ a[data-slot]:hover img {
 
    Only applied when an image exists — the empty-state marker is a light
    dashed border and has to stay on dark to be visible. */
+/* One switch feeds both the banner band and the dormant logo strip, and the
+   strip's edge fades read the same variable, so nothing gets out of step. */
+.mt-sponsors-banner,
+.mt-sponsors {
+  --mt-sponsors-bg: var(--mt-hueso);
+}
+.mt-sponsors-banner-oscuro,
+.mt-sponsors-oscuro {
+  --mt-sponsors-bg: var(--mt-negro);
+}
+
 .mt-sponsors-banner {
-  background: var(--mt-hueso);
+  background: var(--mt-sponsors-bg);
   padding: clamp(14px, 2.4vw, 26px) clamp(12px, 3vw, 40px);
 }
 /* The source art is 2187px wide; capping keeps it from upscaling and going
@@ -1427,7 +1438,7 @@ a[data-slot]:hover img {
    #f4f2ec the buttons use, spanning the full width. */
 .mt-sponsors {
   position: relative;
-  background: var(--mt-hueso);
+  background: var(--mt-sponsors-bg);
   padding: clamp(22px, 3.4vw, 38px) 0;
   overflow: hidden;
 }
@@ -1444,11 +1455,11 @@ a[data-slot]:hover img {
 }
 .mt-sponsors::before {
   left: 0;
-  background: linear-gradient(90deg, var(--mt-hueso), rgba(244, 242, 236, 0));
+  background: linear-gradient(90deg, var(--mt-sponsors-bg), transparent);
 }
 .mt-sponsors::after {
   right: 0;
-  background: linear-gradient(270deg, var(--mt-hueso), rgba(244, 242, 236, 0));
+  background: linear-gradient(270deg, var(--mt-sponsors-bg), transparent);
 }
 
 .mt-sponsors-track {

@@ -144,6 +144,7 @@ export const moratConfigSchema = z.object({
   fotos: z.array(fotoItemSchema).default([]),
 
   /* 10 · Patrocinadores */
+  patrocinadoresFondo: z.enum(["claro", "oscuro"]).default("claro"),
   artePatrocinadores: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
   patrocinadores: z.array(patrocinadorSchema).default([]),
 

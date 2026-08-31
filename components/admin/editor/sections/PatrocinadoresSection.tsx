@@ -5,6 +5,7 @@ import { Plus, Trash2, ArrowUp, ArrowDown, Award } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { Select } from "@/components/ui/Select";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { UploadButton } from "@/components/admin/UploadButton";
 import { ArtSlotField } from "@/components/admin/editor/ArtSlotField";
@@ -60,7 +61,9 @@ export function PatrocinadoresSection({ eventoId }: Props) {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   const logosHabilitados = PATROCINADORES_LOGOS_INDIVIDUALES;
-  const bannerWins = isUrl(watch("artePatrocinadores.image"));
+  const bannerUrl = watch("artePatrocinadores.image") ?? "";
+  const bannerWins = isUrl(bannerUrl);
+  const fondoOscuro = watch("patrocinadoresFondo") === "oscuro";
 
   return (
     <section id="patrocinadores" className="flex flex-col gap-4 scroll-mt-32">
@@ -85,6 +88,41 @@ export function PatrocinadoresSection({ eventoId }: Props) {
           </Button>
         )}
       </div>
+
+      <Card className="flex flex-col gap-3">
+        <Select
+          label="Fondo de la banda"
+          id="patrocinadoresFondo"
+          {...register("patrocinadoresFondo")}
+        >
+          <option value="claro">Claro — para logos negros</option>
+          <option value="oscuro">Oscuro — para logos blancos</option>
+        </Select>
+        <span className="text-xs opacity-60">
+          Los logos negros necesitan fondo claro; los blancos, fondo oscuro. Cambialo según
+          la versión del banner que subas.
+        </span>
+
+        {bannerWins && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium">Cómo se va a ver</span>
+            {/* Hex values mirror --mt-negro and --mt-hueso from app/morat.css,
+                which the admin does not load. */}
+            <div
+              className="rounded-input border border-line-light dark:border-line-dark p-3 flex items-center justify-center"
+              style={{ background: fondoOscuro ? "#060607" : "#f4f2ec" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerUrl}
+                alt=""
+                className="max-h-24 max-w-full object-contain"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        )}
+      </Card>
 
       {logosHabilitados && (
         <>

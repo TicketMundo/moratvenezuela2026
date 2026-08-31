@@ -6,6 +6,8 @@ import { ArtImage } from "./ArtSlot";
 interface Props {
   arte: ArtSlot;
   patrocinadores: Patrocinador[];
+  /** Ground the logos sit on — follows whichever artwork was uploaded. */
+  fondo: "claro" | "oscuro";
 }
 
 /**
@@ -29,7 +31,8 @@ function copiesFor(count: number): number {
  * artwork is black) and scrolls them on their own, which needs no controls on
  * mobile and works at any logo count.
  */
-export function PatrocinadoresSection({ arte, patrocinadores }: Props) {
+export function PatrocinadoresSection({ arte, patrocinadores, fondo }: Props) {
+  const oscuro = fondo === "oscuro";
   const logos = PATROCINADORES_LOGOS_INDIVIDUALES
     ? patrocinadores.filter((p) => isUrl(p.logo))
     : [];
@@ -40,7 +43,7 @@ export function PatrocinadoresSection({ arte, patrocinadores }: Props) {
   if (isUrl(arte.image)) {
     return (
       <section className="mt-sec mt-bleed">
-        <div className="mt-sponsors-banner">
+        <div className={oscuro ? "mt-sponsors-banner mt-sponsors-banner-oscuro" : "mt-sponsors-banner"}>
           <ArtImage slot="sponsors" art={arte} label="Patrocinadores" className="mt-img" />
         </div>
       </section>
@@ -60,7 +63,7 @@ export function PatrocinadoresSection({ arte, patrocinadores }: Props) {
 
   return (
     <section className="mt-bleed">
-      <div className="mt-sponsors">
+      <div className={oscuro ? "mt-sponsors mt-sponsors-oscuro" : "mt-sponsors"}>
         <div className="mt-sponsors-track">
           {Array.from({ length: copies }, (_, copy) => (
             // Only the first copy is real content; the rest exist to feed the

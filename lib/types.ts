@@ -151,6 +151,11 @@ export interface MoratConfig {
   fotos: FotoItem[];
 
   /* ── 10 · Patrocinadores ───────────────────────────────────────── */
+  /**
+   * Ground the logos sit on. Black artwork needs "claro", white artwork needs
+   * "oscuro" — it follows whichever version of the banner is uploaded.
+   */
+  patrocinadoresFondo: "claro" | "oscuro";
   /** A composed banner. When set it replaces the logo strip entirely. */
   artePatrocinadores: ArtSlot;
   /** Individual logos, shown on a light band because the artwork is black. */
@@ -272,6 +277,7 @@ export const DEFAULT_MORAT_CONFIG: MoratConfig = {
 
   fotos: [],
 
+  patrocinadoresFondo: "claro",
   artePatrocinadores: { ...EMPTY_ART },
   patrocinadores: [],
 
