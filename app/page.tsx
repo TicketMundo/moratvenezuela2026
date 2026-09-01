@@ -148,6 +148,7 @@ export default async function HomePage() {
               arte={config.arteTituloEntradas}
               nota={config.entradasNota}
               funciones={config.funciones}
+              cola={config.cola}
             />
             <BandaSection arte={config.arteTituloBanda} integrantes={config.integrantes} />
             <ClaimSection

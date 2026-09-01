@@ -607,6 +607,115 @@ a[data-slot]:hover img {
   white-space: nowrap;
 }
 
+/* ===== Cola virtual =====
+   The overlay is portaled into .mt-page, so it lands as a sibling of
+   .mt-festival and paints above every section. Its `position: fixed` has to
+   beat `.mt-page > * { position: relative }` — same specificity, so this block
+   must stay below that rule in the file. */
+.mt-buy-esperando {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.mt-cola {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+  background: rgba(6, 6, 7, 0.88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: mtFade 0.25s ease both;
+}
+.mt-cola-box {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  padding: 40px 32px 32px;
+  border: 1px solid var(--mt-linea);
+  border-radius: 4px;
+  background: var(--mt-carbon);
+  overflow: hidden;
+}
+.mt-cola-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--mt-prisma);
+}
+.mt-cola-title {
+  margin: 0 0 18px;
+  font-family: var(--mt-display);
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 900;
+  font-stretch: 115%;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.mt-cola-lead {
+  margin: 0;
+  font-family: var(--mt-mono);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mt-humo);
+}
+.mt-cola-pos {
+  margin: 6px 0 18px;
+  font-family: var(--mt-display);
+  font-size: clamp(52px, 13vw, 88px);
+  font-weight: 900;
+  font-stretch: 115%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--mt-hueso);
+  text-shadow: -0.018em 0 rgba(255, 77, 109, 0.55), 0.018em 0 rgba(60, 224, 224, 0.55);
+}
+.mt-cola-eta {
+  margin: 0 0 22px;
+  font-family: var(--mt-mono);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--mt-hueso);
+}
+.mt-cola-eta b {
+  font-variant-numeric: tabular-nums;
+}
+.mt-cola-nota {
+  margin: 0 auto 26px;
+  max-width: 400px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(244, 242, 236, 0.7);
+}
+.mt-cola-salir {
+  padding: 10px 20px;
+  border: 1px solid rgba(244, 242, 236, 0.22);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--mt-humo);
+  font-family: var(--mt-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.mt-cola-salir:hover {
+  color: var(--mt-hueso);
+  border-color: rgba(244, 242, 236, 0.45);
+}
+@media (max-width: 560px) {
+  .mt-cola-box { padding: 32px 20px 24px; }
+}
+
 /* ===== Marquee ===== */
 .mt-marquee {
   position: relative;

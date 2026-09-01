@@ -35,6 +35,21 @@ export interface Funcion {
   entradas: Entrada[];
 }
 
+/**
+ * Virtual waiting room in front of the ticketing skin.
+ *
+ * Off, or with an empty `recurso`, the buy buttons are plain links and behave
+ * exactly as they did before — so a misconfigured queue can never block a sale.
+ */
+export interface Cola {
+  activa: boolean;
+  /**
+   * The throttle service's `resource`. One value for the whole event, so both
+   * nights share the same line and the same capacity.
+   */
+  recurso: string;
+}
+
 export interface Integrante {
   nombre: string;
   rol: string;
@@ -127,6 +142,7 @@ export interface MoratConfig {
   arteTituloEntradas: ArtSlot;
   entradasNota: string;
   funciones: Funcion[];
+  cola: Cola;
 
   /* ── 6 · La Banda ──────────────────────────────────────────────── */
   arteTituloBanda: ArtSlot;
@@ -255,6 +271,10 @@ export const DEFAULT_MORAT_CONFIG: MoratConfig = {
       ],
     },
   ],
+
+  // Starts off on purpose: it is switched on from the admin once the resource
+  // is provisioned on the throttle service.
+  cola: { activa: false, recurso: "morat-en-venezuela-2026" },
 
   arteTituloBanda: { ...EMPTY_ART },
   integrantes: [

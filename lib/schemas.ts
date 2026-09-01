@@ -30,6 +30,11 @@ export const funcionSchema = z.object({
   entradas: z.array(entradaSchema).default([]),
 });
 
+export const colaSchema = z.object({
+  activa: z.boolean().default(false),
+  recurso: z.string().default(""),
+});
+
 export const integranteSchema = z.object({
   nombre: z.string().min(1, "Requerido"),
   rol: z.string().default(""),
@@ -117,6 +122,7 @@ export const moratConfigSchema = z.object({
   arteTituloEntradas: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),
   entradasNota: z.string().default(""),
   funciones: z.array(funcionSchema).default([]),
+  cola: colaSchema.default({ activa: false, recurso: "" }),
 
   /* 6 · La Banda */
   arteTituloBanda: artSlotSchema.default({ image: "", imageMobile: "", link: "" }),

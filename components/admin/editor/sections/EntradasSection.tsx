@@ -136,7 +136,10 @@ function EntradasDeFuncion({ funcionIndex }: { funcionIndex: number }) {
 }
 
 export function EntradasSection({ eventoId }: Props) {
-  const { control, register } = useFormContext<MoratConfigInput>();
+  const { control, register, watch } = useFormContext<MoratConfigInput>();
+
+  const colaActiva = watch("cola.activa");
+  const colaRecurso = (watch("cola.recurso") ?? "").trim();
 
   const { fields, append, remove, move } = useFieldArray({ control, name: "funciones" });
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
@@ -169,6 +172,47 @@ export function EntradasSection({ eventoId }: Props) {
           placeholder="Ej: Mismo show las dos noches — elegí la fecha que prefieras."
           {...register("entradasNota")}
         />
+      </Card>
+
+      <Card className="flex flex-col gap-5">
+        <div>
+          <h3 className="text-sm font-semibold">Cola virtual</h3>
+          <p className="text-xs opacity-60 mt-0.5">
+            Sala de espera antes de mandar al comprador al skin de Ticketmundo. Una sola fila
+            para todo el evento: las dos noches comparten cupo.
+          </p>
+        </div>
+
+        <Switch
+          id="cola.activa"
+          label="Activar la cola"
+          hint="Apagada, los botones Comprar van directo al link, como hasta ahora."
+          {...register("cola.activa")}
+        />
+
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Nombre del recurso"
+            id="cola.recurso"
+            placeholder="Ej: morat-en-venezuela-2026"
+            {...register("cola.recurso")}
+          />
+          <span className="text-xs opacity-60">
+            Tiene que coincidir con el recurso dado de alta en el servicio de throttle. Si no
+            coincide, la cola no limita nada.
+          </span>
+        </div>
+
+        {colaActiva && colaRecurso === "" && (
+          <p className="text-sm text-brand">
+            La cola está activada pero sin recurso, así que no se aplica. Completá el nombre.
+          </p>
+        )}
+
+        <p className="text-xs opacity-60">
+          Si el servicio de cola no responde, los compradores pasan igual. Es a propósito: una
+          caída de la cola no debe frenar la venta.
+        </p>
       </Card>
 
       {fields.length === 0 && (
