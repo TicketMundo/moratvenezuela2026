@@ -13,12 +13,33 @@
 const ENDPOINT = "https://throttle.ticketmundo.live/api/throttle";
 const UUID_KEY = "morat-cola-uuid";
 
+/**
+ * Shape of the throttle response, from a live call against
+ * resource `morat-en-venezuela-2026`:
+ *
+ *   { resource, host: "<40-char hex>", performed: false, id, is_allowed: false,
+ *     position: 11, queue_position: 9, eta_in_seconds: 1312,
+ *     refresh_in_milliseconds: 120000, current_capacity: 11, max_capacity: 2,
+ *     created_at, updated_at, expires_at }
+ *
+ * `host` is a server-issued token, not the uuid that was sent. It is what
+ * travels to the purchase skin.
+ *
+ * `expires_at` sat five minutes after `created_at`, so the place in line has a
+ * TTL and the poll doubles as its keepalive.
+ */
 export interface ColaEstado {
   is_allowed: boolean;
   host?: string;
+  /** What the reference implementation displays. Includes those already inside. */
   position?: number;
+  /** People actually ahead in the waiting line, i.e. position minus capacity. */
+  queue_position?: number;
   eta_in_seconds?: number;
   refresh_in_milliseconds?: number;
+  current_capacity?: number;
+  max_capacity?: number;
+  expires_at?: string;
 }
 
 function uuidNuevo(): string {

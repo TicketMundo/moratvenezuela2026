@@ -61,7 +61,7 @@ export function ColaOverlay({ position, etaIso, onSalir }: Props) {
         </p>
 
         <h2 className="mt-cola-title" id="mt-cola-titulo">
-          Por favor esperá
+          Por favor espera
         </h2>
         <div className="mt-prism-bar" />
 
